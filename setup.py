@@ -13,7 +13,7 @@ setuptools.setup(
         ]
     },
     install_requires=[
-        "keras"
+        "keras >= 2.1.3"
     ],
     license="MIT",
     name="keras-resnet",

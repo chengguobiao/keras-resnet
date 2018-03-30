@@ -17,7 +17,7 @@ parameters = {
 }
 
 
-def time_distributed_basic_2d(filters, stage=0, block=0, kernel_size=3, numerical_name=False, stride=None, freeze_bn=False):
+def time_distributed_basic_2d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwargs):
     """
 
     A time distributed two-dimensional basic block.
@@ -43,6 +43,14 @@ def time_distributed_basic_2d(filters, stage=0, block=0, kernel_size=3, numerica
         >>> keras_resnet.blocks.time_distributed_basic_2d(64)
 
     """
+    if "freeze_bn" in kwargs:
+        # TODO: add depreciation warning
+        pass
+
+    if "numerical_name" in kwargs:
+        # TODO: add depreciation warning
+        pass
+
     if stride is None:
         if block != 0 or stage == 0:
             stride = 1
@@ -85,7 +93,7 @@ def time_distributed_basic_2d(filters, stage=0, block=0, kernel_size=3, numerica
     return f
 
 
-def time_distributed_bottleneck_2d(filters, stage=0, block=0, kernel_size=3, numerical_name=False, stride=None, freeze_bn=False):
+def time_distributed_bottleneck_2d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwargs):
     """
 
     A time distributed two-dimensional bottleneck block.
@@ -111,6 +119,14 @@ def time_distributed_bottleneck_2d(filters, stage=0, block=0, kernel_size=3, num
         >>> keras_resnet.blocks.time_distributed_bottleneck_2d(64)
 
     """
+    if "freeze_bn" in kwargs:
+        # TODO: add depreciation warning
+        pass
+
+    if "numerical_name" in kwargs:
+        # TODO: add depreciation warning
+        pass
+
     if stride is None:
         if block != 0 or stage == 0:
             stride = 1

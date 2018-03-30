@@ -113,7 +113,7 @@ class ResNet101(keras.models.Model):
 
         >>> x = keras.layers.Input(shape)
 
-        >>> model = keras_resnet.classifiers.ResNet101(x)
+        >>> model = keras_resnet.classifiers.ResNet101(x, classes)
 
         >>> model.compile("adam", "categorical_crossentropy", ["accuracy"])
     """

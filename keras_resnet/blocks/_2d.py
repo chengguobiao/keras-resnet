@@ -17,7 +17,7 @@ parameters = {
 }
 
 
-def basic_2d(filters, stage=0, block=0, kernel_size=3, numerical_name=False, stride=None, freeze_bn=False):
+def basic_2d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwargs):
     """
     A two-dimensional basic block.
 
@@ -41,6 +41,14 @@ def basic_2d(filters, stage=0, block=0, kernel_size=3, numerical_name=False, str
 
         >>> keras_resnet.blocks.basic_2d(64)
     """
+    if "freeze_bn" in kwargs:
+        # TODO: add depreciation warning
+        pass
+
+    if "numerical_name" in kwargs:
+        # TODO: add depreciation warning
+        pass
+
     if stride is None:
         if block != 0 or stage == 0:
             stride = 1
@@ -52,7 +60,7 @@ def basic_2d(filters, stage=0, block=0, kernel_size=3, numerical_name=False, str
     else:
         axis = 1
 
-    if block > 0 and numerical_name:
+    if block > 0 and kwargs["numerical_name"]:
         block_char = "b{}".format(block)
     else:
         block_char = chr(ord('a') + block)
@@ -83,7 +91,7 @@ def basic_2d(filters, stage=0, block=0, kernel_size=3, numerical_name=False, str
     return f
 
 
-def bottleneck_2d(filters, stage=0, block=0, kernel_size=3, numerical_name=False, stride=None, freeze_bn=False):
+def bottleneck_2d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwargs):
     """
     A two-dimensional bottleneck block.
 
@@ -107,6 +115,14 @@ def bottleneck_2d(filters, stage=0, block=0, kernel_size=3, numerical_name=False
 
         >>> keras_resnet.blocks.bottleneck_2d(64)
     """
+    if "freeze_bn" in kwargs:
+        # TODO: add depreciation warning
+        pass
+
+    if "numerical_name" in kwargs:
+        # TODO: add depreciation warning
+        pass
+
     if stride is None:
         if block != 0 or stage == 0:
             stride = 1
@@ -118,7 +134,7 @@ def bottleneck_2d(filters, stage=0, block=0, kernel_size=3, numerical_name=False
     else:
         axis = 1
 
-    if block > 0 and numerical_name:
+    if block > 0 and kwargs["numerical_name"]:
         block_char = "b{}".format(block)
     else:
         block_char = chr(ord('a') + block)

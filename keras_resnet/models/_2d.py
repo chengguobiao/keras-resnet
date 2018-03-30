@@ -7,6 +7,8 @@ keras_resnet.models._2d
 This module implements popular two-dimensional residual models.
 """
 
+import warnings
+
 import keras.backend
 import keras.layers
 import keras.models
@@ -16,7 +18,7 @@ import keras_resnet.blocks
 import keras.layers
 
 
-def ResNet(inputs, blocks, block, include_top=True, classes=1000, freeze_bn=True, numerical_names=None, *args, **kwargs):
+def ResNet(inputs, blocks, block, include_top=True, classes=1000, *args, **kwargs):
     """
     Constructs a `keras.models.Model` object using the given block count.
 
@@ -29,10 +31,6 @@ def ResNet(inputs, blocks, block, include_top=True, classes=1000, freeze_bn=True
     :param include_top: if true, includes classification layers
 
     :param classes: number of classes to classify (include_top must be true)
-
-    :param freeze_bn: if true, freezes BatchNormalization layers (ie. no updates are done in these layers)
-
-    :param numerical_names: list of bool, same size as blocks, used to indicate whether names of layers should include numbers or letters
 
     :return model: ResNet model with encoding output (if `include_top=False`) or classification output (if `include_top=True`)
 
@@ -53,17 +51,44 @@ def ResNet(inputs, blocks, block, include_top=True, classes=1000, freeze_bn=True
 
         >>> model.compile("adam", "categorical_crossentropy", ["accuracy"])
     """
+    if "freeze_bn" in kwargs:
+        message = """
+
+        The `freeze_bn` argument was depreciated in version 0.2.0 of 
+        Keras-ResNet. It will be removed in version 0.3.0. 
+
+        You can replace `freeze_bn=True` with:
+
+                batch_normalization={"trainable": False}
+        """
+
+        warnings.warn(message)
+
+    if "numerical_name" in kwargs:
+        message = """
+
+        The `numerical_name` argument was depreciated in version 0.2.0 of 
+        Keras-ResNet. It will be removed in version 0.3.0. 
+        """
+
+        warnings.warn(message)
+
+    if "batch_normalization" in kwargs:
+        batch_normalization_kwargs = kwargs["batch_normalization"]
+    else:
+        batch_normalization_kwargs = {}
+
     if keras.backend.image_data_format() == "channels_last":
         axis = 3
     else:
         axis = 1
 
-    if numerical_names is None:
-        numerical_names = [True] * len(blocks)
+    if "numerical_name" not in kwargs:
+        kwargs["numerical_names"] = [True] * len(blocks)
 
     x = keras.layers.ZeroPadding2D(padding=3, name="padding_conv1")(inputs)
     x = keras.layers.Conv2D(64, (7, 7), strides=(2, 2), use_bias=False, name="conv1")(x)
-    x = keras.layers.BatchNormalization(axis=axis, epsilon=1e-5, name="bn_conv1")(x)
+    x = keras.layers.BatchNormalization(axis=axis, epsilon=1e-5, name="bn_conv1", **batch_normalization_kwargs)(x)
     x = keras.layers.Activation("relu", name="conv1_relu")(x)
     x = keras.layers.MaxPooling2D((3, 3), strides=(2, 2), padding="same", name="pool1")(x)
 
@@ -73,7 +98,7 @@ def ResNet(inputs, blocks, block, include_top=True, classes=1000, freeze_bn=True
 
     for stage_id, iterations in enumerate(blocks):
         for block_id in range(iterations):
-            x = block(features, stage_id, block_id, numerical_name=(block_id > 0 and numerical_names[stage_id]), freeze_bn=freeze_bn)(x)
+            x = block(features, stage_id, block_id, numerical_name=(block_id > 0 and kwargs["numerical_names"][stage_id]))(x)
 
         features *= 2
 
@@ -183,6 +208,7 @@ def ResNet50(inputs, blocks=None, include_top=True, classes=1000, *args, **kwarg
     """
     if blocks is None:
         blocks = [3, 4, 6, 3]
+
     numerical_names = [False, False, False, False]
 
     return ResNet(inputs, blocks, numerical_names=numerical_names, block=keras_resnet.blocks.bottleneck_2d, include_top=include_top, classes=classes, *args, **kwargs)
@@ -216,6 +242,7 @@ def ResNet101(inputs, blocks=None, include_top=True, classes=1000, *args, **kwar
     """
     if blocks is None:
         blocks = [3, 4, 23, 3]
+
     numerical_names = [False, True, True, False]
 
     return ResNet(inputs, blocks, numerical_names=numerical_names, block=keras_resnet.blocks.bottleneck_2d, include_top=include_top, classes=classes, *args, **kwargs)
@@ -249,6 +276,7 @@ def ResNet152(inputs, blocks=None, include_top=True, classes=1000, *args, **kwar
     """
     if blocks is None:
         blocks = [3, 8, 36, 3]
+
     numerical_names = [False, True, True, False]
 
     return ResNet(inputs, blocks, numerical_names=numerical_names, block=keras_resnet.blocks.bottleneck_2d, include_top=include_top, classes=classes, *args, **kwargs)
@@ -282,6 +310,7 @@ def ResNet200(inputs, blocks=None, include_top=True, classes=1000, *args, **kwar
     """
     if blocks is None:
         blocks = [3, 24, 36, 3]
+
     numerical_names = [False, True, True, False]
 
     return ResNet(inputs, blocks, numerical_names=numerical_names, block=keras_resnet.blocks.bottleneck_2d, include_top=include_top, classes=classes, *args, **kwargs)

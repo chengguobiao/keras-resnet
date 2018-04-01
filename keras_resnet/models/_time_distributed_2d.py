@@ -74,7 +74,7 @@ def TimeDistributedResNet(inputs, blocks, block, include_top=True, classes=1000,
 
     for stage_id, iterations in enumerate(blocks):
         for block_id in range(iterations):
-            x = block(features, stage_id, block_id, numerical_name=(blocks[stage_id] > 6), freeze_bn=freeze_bn)(x)
+            x = block(features, stage_id, block_id, numerical_names=(blocks[stage_id] > 6), freeze_bn=freeze_bn)(x)
 
         features *= 2
         outputs.append(x)

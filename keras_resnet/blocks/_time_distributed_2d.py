@@ -48,10 +48,10 @@ def time_distributed_basic_2d(filters, stage=0, block=0, kernel_size=3, stride=N
 
         warnings.warn(message)
 
-    if "numerical_name" in kwargs:
+    if "numerical_names" in kwargs:
         message = """
 
-        The `numerical_name` argument was depreciated in version 0.2.0 of 
+        The `numerical_names` argument was depreciated in version 0.2.0 of 
         Keras-ResNet. It will be removed in version 0.3.0. 
         """
 
@@ -80,7 +80,7 @@ def time_distributed_basic_2d(filters, stage=0, block=0, kernel_size=3, stride=N
     else:
         axis = 1
 
-    if block > 0 and kwargs["numerical_name"]:
+    if block > 0 and kwargs["numerical_names"]:
         block_char = "b{}".format(block)
     else:
         block_char = chr(ord('a') + block)
@@ -146,10 +146,10 @@ def time_distributed_bottleneck_2d(filters, stage=0, block=0, kernel_size=3, str
 
         warnings.warn(message)
 
-    if "numerical_name" in kwargs:
+    if "numerical_names" in kwargs:
         message = """
 
-        The `numerical_name` argument was depreciated in version 0.2.0 of 
+        The `numerical_names` argument was depreciated in version 0.2.0 of 
         Keras-ResNet. It will be removed in version 0.3.0. 
         """
 
@@ -178,7 +178,7 @@ def time_distributed_bottleneck_2d(filters, stage=0, block=0, kernel_size=3, str
     else:
         axis = 1
 
-    if block > 0 and kwargs["numerical_name"]:
+    if block > 0 and kwargs["numerical_names"]:
         block_char = "b{}".format(block)
     else:
         block_char = chr(ord('a') + block)

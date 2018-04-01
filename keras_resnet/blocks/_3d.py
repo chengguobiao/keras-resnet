@@ -46,10 +46,10 @@ def basic_3d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwargs):
 
         warnings.warn(message)
 
-    if "numerical_name" in kwargs:
+    if "numerical_names" in kwargs:
         message = """
 
-        The `numerical_name` argument was depreciated in version 0.2.0 of 
+        The `numerical_names` argument was depreciated in version 0.2.0 of 
         Keras-ResNet. It will be removed in version 0.3.0. 
         """
 
@@ -78,7 +78,7 @@ def basic_3d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwargs):
     else:
         axis = 1
 
-    if block > 0 and kwargs["numerical_name"]:
+    if block > 0 and kwargs["numerical_names"]:
         block_char = "b{}".format(block)
     else:
         block_char = chr(ord('a') + block)
@@ -142,10 +142,10 @@ def bottleneck_3d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwarg
 
         warnings.warn(message)
 
-    if "numerical_name" in kwargs:
+    if "numerical_names" in kwargs:
         message = """
 
-        The `numerical_name` argument was depreciated in version 0.2.0 of 
+        The `numerical_names` argument was depreciated in version 0.2.0 of 
         Keras-ResNet. It will be removed in version 0.3.0. 
         """
 
@@ -174,7 +174,7 @@ def bottleneck_3d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwarg
     else:
         axis = 1
 
-    if block > 0 and kwargs["numerical_name"]:
+    if block > 0 and kwargs["numerical_names"]:
         block_char = "b{}".format(block)
     else:
         block_char = chr(ord('a') + block)

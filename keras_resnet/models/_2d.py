@@ -64,10 +64,10 @@ def ResNet(inputs, blocks, block, include_top=True, classes=1000, *args, **kwarg
 
         warnings.warn(message)
 
-    if "numerical_name" in kwargs:
+    if "numerical_names" in kwargs:
         message = """
 
-        The `numerical_name` argument was depreciated in version 0.2.0 of 
+        The `numerical_names` argument was depreciated in version 0.2.0 of 
         Keras-ResNet. It will be removed in version 0.3.0. 
         """
 
@@ -83,8 +83,8 @@ def ResNet(inputs, blocks, block, include_top=True, classes=1000, *args, **kwarg
     else:
         axis = 1
 
-    if "numerical_name" not in kwargs:
-        kwargs["numerical_names"] = [True] * len(blocks)
+    if "numerical_names" not in kwargs:
+        numerical_names = [True] * len(blocks)
 
     x = keras.layers.ZeroPadding2D(padding=3, name="padding_conv1")(inputs)
     x = keras.layers.Conv2D(64, (7, 7), strides=(2, 2), use_bias=False, name="conv1")(x)
@@ -98,11 +98,22 @@ def ResNet(inputs, blocks, block, include_top=True, classes=1000, *args, **kwarg
 
     for stage_id, iterations in enumerate(blocks):
         for block_id in range(iterations):
-            x = block(features, stage_id, block_id, numerical_name=(block_id > 0 and kwargs["numerical_names"][stage_id]))(x)
+            block_kargs = {}
+
+            if "numerical_names" in kwargs:
+                numerical_names = block_id > 0 and kwargs["numerical_names"][stage_id]
+
+            block_kargs.update({
+                "numerical_names": numerical_names
+            })
+
+            x = block(features, stage_id, block_id, **block_kargs)(x)
 
         features *= 2
 
         outputs.append(x)
+
+    kwargs.pop("numerical_names", None)
 
     if include_top:
         assert classes > 0
@@ -145,7 +156,15 @@ def ResNet18(inputs, blocks=None, include_top=True, classes=1000, *args, **kwarg
     if blocks is None:
         blocks = [2, 2, 2, 2]
 
-    return ResNet(inputs, blocks, block=keras_resnet.blocks.basic_2d, include_top=include_top, classes=classes, *args, **kwargs)
+    return ResNet(
+        inputs,
+        blocks,
+        block=keras_resnet.blocks.basic_2d,
+        include_top=include_top,
+        classes=classes,
+        *args,
+        **kwargs
+    )
 
 
 def ResNet34(inputs, blocks=None, include_top=True, classes=1000, *args, **kwargs):
@@ -177,7 +196,15 @@ def ResNet34(inputs, blocks=None, include_top=True, classes=1000, *args, **kwarg
     if blocks is None:
         blocks = [3, 4, 6, 3]
 
-    return ResNet(inputs, blocks, block=keras_resnet.blocks.basic_2d, include_top=include_top, classes=classes, *args, **kwargs)
+    return ResNet(
+        inputs,
+        blocks,
+        block=keras_resnet.blocks.basic_2d,
+        include_top=include_top,
+        classes=classes,
+        *args,
+        **kwargs
+    )
 
 
 def ResNet50(inputs, blocks=None, include_top=True, classes=1000, *args, **kwargs):
@@ -211,7 +238,16 @@ def ResNet50(inputs, blocks=None, include_top=True, classes=1000, *args, **kwarg
 
     numerical_names = [False, False, False, False]
 
-    return ResNet(inputs, blocks, numerical_names=numerical_names, block=keras_resnet.blocks.bottleneck_2d, include_top=include_top, classes=classes, *args, **kwargs)
+    return ResNet(
+        inputs,
+        blocks,
+        numerical_names=numerical_names,
+        block=keras_resnet.blocks.bottleneck_2d,
+        include_top=include_top,
+        classes=classes,
+        *args,
+        **kwargs
+    )
 
 
 def ResNet101(inputs, blocks=None, include_top=True, classes=1000, *args, **kwargs):
@@ -245,7 +281,16 @@ def ResNet101(inputs, blocks=None, include_top=True, classes=1000, *args, **kwar
 
     numerical_names = [False, True, True, False]
 
-    return ResNet(inputs, blocks, numerical_names=numerical_names, block=keras_resnet.blocks.bottleneck_2d, include_top=include_top, classes=classes, *args, **kwargs)
+    return ResNet(
+        inputs,
+        blocks,
+        numerical_names=numerical_names,
+        block=keras_resnet.blocks.bottleneck_2d,
+        include_top=include_top,
+        classes=classes,
+        *args,
+        **kwargs
+    )
 
 
 def ResNet152(inputs, blocks=None, include_top=True, classes=1000, *args, **kwargs):
@@ -277,9 +322,17 @@ def ResNet152(inputs, blocks=None, include_top=True, classes=1000, *args, **kwar
     if blocks is None:
         blocks = [3, 8, 36, 3]
 
-    numerical_names = [False, True, True, False]
+    kwargs["numerical_names"] = [False, True, True, False]
 
-    return ResNet(inputs, blocks, numerical_names=numerical_names, block=keras_resnet.blocks.bottleneck_2d, include_top=include_top, classes=classes, *args, **kwargs)
+    return ResNet(
+        inputs,
+        blocks,
+        block=keras_resnet.blocks.bottleneck_2d,
+        include_top=include_top,
+        classes=classes,
+        *args,
+        **kwargs
+    )
 
 
 def ResNet200(inputs, blocks=None, include_top=True, classes=1000, *args, **kwargs):
@@ -311,6 +364,14 @@ def ResNet200(inputs, blocks=None, include_top=True, classes=1000, *args, **kwar
     if blocks is None:
         blocks = [3, 24, 36, 3]
 
-    numerical_names = [False, True, True, False]
+    kwargs["numerical_names"] = [False, True, True, False]
 
-    return ResNet(inputs, blocks, numerical_names=numerical_names, block=keras_resnet.blocks.bottleneck_2d, include_top=include_top, classes=classes, *args, **kwargs)
+    return ResNet(
+        inputs,
+        blocks,
+        block=keras_resnet.blocks.bottleneck_2d,
+        include_top=include_top,
+        classes=classes,
+        *args,
+        **kwargs
+    )

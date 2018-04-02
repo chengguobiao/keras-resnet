@@ -8,12 +8,26 @@ import pkg_resources
 import sklearn.model_selection
 import tensorflow
 
+import keras_resnet.metrics
 import keras_resnet.models
 
 _benchmarks = {
     "CIFAR-10": keras.datasets.cifar10,
     "CIFAR-100": keras.datasets.cifar100,
     "MNIST": keras.datasets.mnist
+}
+
+_metrics = {
+    "CIFAR-10": [
+        keras_resnet.metrics.top_1_categorical_error
+    ],
+    "CIFAR-100": [
+        keras_resnet.metrics.top_1_categorical_error,
+        keras_resnet.metrics.top_5_categorical_error
+    ],
+    "MNIST": [
+        keras_resnet.metrics.top_1_categorical_error
+    ]
 }
 
 _names = {
@@ -39,7 +53,10 @@ _names = {
         ]
     )
 )
-@click.option("--device", default=0)
+@click.option(
+    "--device",
+    default=0
+)
 @click.option(
     "--name",
     default="ResNet-50",
@@ -54,7 +71,12 @@ _names = {
         ]
     )
 )
-def __main__(benchmark, device, name):
+@click.option(
+    "--pretrained",
+    default=False,
+    is_flag=True
+)
+def __main__(benchmark, device, name, pretrained):
     configuration = tensorflow.ConfigProto()
 
     configuration.gpu_options.allow_growth = True
@@ -65,14 +87,17 @@ def __main__(benchmark, device, name):
 
     keras.backend.set_session(session)
 
-    (training_x, training_y), _ = _benchmarks[benchmark].load_data()
+    (training_x, training_y), (test_x, test_y) = _benchmarks[benchmark].load_data()
 
     training_x = training_x.astype(numpy.float16)
 
     training_y = keras.utils.np_utils.to_categorical(training_y)
 
-    training_x, validation_x, training_y, validation_y = sklearn.model_selection.train_test_split(
-        training_x, training_y)
+    training_x, validation_x, training_y, validation_y = sklearn.model_selection.train_test_split(training_x, training_y)
+
+    test_x = test_x.astype(numpy.float16)
+
+    test_y = keras.utils.np_utils.to_categorical(test_y)
 
     generator = keras.preprocessing.image.ImageDataGenerator(
         horizontal_flip=True
@@ -96,13 +121,37 @@ def __main__(benchmark, device, name):
         batch_size=256
     )
 
+    test_data = keras.preprocessing.image.ImageDataGenerator()
+
+    test_data.fit(test_x)
+
+    test_data = test_data.flow(
+        x=test_x,
+        y=test_y,
+        batch_size=256
+    )
+
     shape, classes = training_x.shape[1:], training_y.shape[-1]
 
     x = keras.layers.Input(shape)
 
-    model = _names[name](x, classes=classes)
+    model = _names[name](x, classes=classes, numerical_names=True)
 
-    model.compile("adam", "categorical_crossentropy", ["accuracy"])
+    if pretrained:
+        weights_pathname = keras.utils.get_file(
+            "resnet50_weights_tf_dim_ordering_tf_kernels.h5",
+            "https://github.com/fchollet/deep-learning-models/releases/download/v0.2/resnet50_weights_tf_dim_ordering_tf_kernels.h5",
+            cache_subdir="models",
+            md5_hash="a7b3fe01876f51b976af0dea6bc144eb"
+        )
+
+        model.load_weights(weights_pathname, by_name=False)
+
+    model.compile(
+        "adam",
+        "categorical_crossentropy",
+        _metrics[benchmark]
+    )
 
     pathname = os.path.join("data", "checkpoints", benchmark, "{}.hdf5".format(name))
 
@@ -123,12 +172,14 @@ def __main__(benchmark, device, name):
 
     model.fit_generator(
         callbacks=callbacks,
-        epochs=200,
+        epochs=100,
         generator=generator,
-        steps_per_epoch=training_x.shape[0] // 256,
-        validation_data=validation_data,
-        validation_steps=validation_x.shape[0] // 256
+        validation_data=validation_data
     )
+
+    evaluation = model.evaluate_generator(test_data)
+
+    click.echo(evaluation)
 
 
 if __name__ == "__main__":

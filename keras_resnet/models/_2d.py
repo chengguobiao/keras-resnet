@@ -87,7 +87,7 @@ def ResNet(inputs, blocks, block, include_top=True, classes=1000, *args, **kwarg
         numerical_names = [True] * len(blocks)
 
     x = keras.layers.ZeroPadding2D(padding=3, name="padding_conv1")(inputs)
-    x = keras.layers.Conv2D(64, (7, 7), strides=(2, 2), use_bias=False, name="conv1")(x)
+    x = keras.layers.Conv2D(64, (7, 7), strides=(2, 2), name="conv1")(x)
     x = keras.layers.BatchNormalization(axis=axis, epsilon=1e-5, name="bn_conv1", **batch_normalization_kwargs)(x)
     x = keras.layers.Activation("relu", name="conv1_relu")(x)
     x = keras.layers.MaxPooling2D((3, 3), strides=(2, 2), padding="same", name="pool1")(x)

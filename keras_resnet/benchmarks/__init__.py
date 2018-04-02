@@ -8,7 +8,7 @@ import pkg_resources
 import sklearn.model_selection
 import tensorflow
 
-import keras_resnet.classifiers
+import keras_resnet.models
 
 _benchmarks = {
     "CIFAR-10": keras.datasets.cifar10,
@@ -16,14 +16,13 @@ _benchmarks = {
     "MNIST": keras.datasets.mnist
 }
 
-
 _names = {
-    "ResNet-18": keras_resnet.classifiers.ResNet18,
-    "ResNet-34": keras_resnet.classifiers.ResNet34,
-    "ResNet-50": keras_resnet.classifiers.ResNet50,
-    "ResNet-101": keras_resnet.classifiers.ResNet101,
-    "ResNet-152": keras_resnet.classifiers.ResNet152,
-    "ResNet-200": keras_resnet.classifiers.ResNet200
+    "ResNet-18": keras_resnet.models.ResNet18,
+    "ResNet-34": keras_resnet.models.ResNet34,
+    "ResNet-50": keras_resnet.models.ResNet50,
+    "ResNet-101": keras_resnet.models.ResNet101,
+    "ResNet-152": keras_resnet.models.ResNet152,
+    "ResNet-200": keras_resnet.models.ResNet200
 }
 
 
@@ -72,7 +71,8 @@ def __main__(benchmark, device, name):
 
     training_y = keras.utils.np_utils.to_categorical(training_y)
 
-    training_x, validation_x, training_y, validation_y = sklearn.model_selection.train_test_split(training_x, training_y)
+    training_x, validation_x, training_y, validation_y = sklearn.model_selection.train_test_split(
+        training_x, training_y)
 
     generator = keras.preprocessing.image.ImageDataGenerator(
         horizontal_flip=True
@@ -100,7 +100,7 @@ def __main__(benchmark, device, name):
 
     x = keras.layers.Input(shape)
 
-    model = _names[name](x, classes)
+    model = _names[name](x, classes=classes)
 
     model.compile("adam", "categorical_crossentropy", ["accuracy"])
 
@@ -129,6 +129,7 @@ def __main__(benchmark, device, name):
         validation_data=validation_data,
         validation_steps=validation_x.shape[0] // 256
     )
+
 
 if __name__ == "__main__":
     __main__()

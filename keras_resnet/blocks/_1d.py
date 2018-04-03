@@ -87,16 +87,16 @@ def basic_1d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwargs):
 
     def f(x):
         y = keras.layers.ZeroPadding1D(padding=1, name="padding{}{}_branch2a".format(stage_char, block_char))(x)
-        y = keras.layers.Conv1D(filters, kernel_size, strides=stride, name="res{}{}_branch2a".format(stage_char, block_char), **convolution_kwargs)(y)
+        y = keras.layers.Conv1D(filters, kernel_size, strides=stride, use_bias=False, name="res{}{}_branch2a".format(stage_char, block_char), **convolution_kwargs)(y)
         y = keras.layers.BatchNormalization(axis=axis, epsilon=1e-5, name="bn{}{}_branch2a".format(stage_char, block_char), **batch_normalization_kwargs)(y)
         y = keras.layers.Activation("relu", name="res{}{}_branch2a_relu".format(stage_char, block_char))(y)
 
         y = keras.layers.ZeroPadding1D(padding=1, name="padding{}{}_branch2b".format(stage_char, block_char))(y)
-        y = keras.layers.Conv1D(filters, kernel_size, name="res{}{}_branch2b".format(stage_char, block_char), **convolution_kwargs)(y)
+        y = keras.layers.Conv1D(filters, kernel_size, use_bias=False, name="res{}{}_branch2b".format(stage_char, block_char), **convolution_kwargs)(y)
         y = keras.layers.BatchNormalization(axis=axis, epsilon=1e-5, name="bn{}{}_branch2b".format(stage_char, block_char), **batch_normalization_kwargs)(y)
 
         if block == 0:
-            shortcut = keras.layers.Conv1D(filters, (1, 1), strides=stride, name="res{}{}_branch1".format(stage_char, block_char), **convolution_kwargs)(x)
+            shortcut = keras.layers.Conv1D(filters, (1, 1), strides=stride, use_bias=False, name="res{}{}_branch1".format(stage_char, block_char), **convolution_kwargs)(x)
             shortcut = keras.layers.BatchNormalization(axis=axis, epsilon=1e-5, name="bn{}{}_branch1".format(stage_char, block_char), **batch_normalization_kwargs)(shortcut)
         else:
             shortcut = x
@@ -179,20 +179,20 @@ def bottleneck_1d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwarg
     stage_char = str(stage + 2)
 
     def f(x):
-        y = keras.layers.Conv1D(filters, (1, 1), strides=stride, name="res{}{}_branch2a".format(stage_char, block_char), **convolution_kwargs)(x)
+        y = keras.layers.Conv1D(filters, (1, 1), strides=stride, use_bias=False, name="res{}{}_branch2a".format(stage_char, block_char), **convolution_kwargs)(x)
         y = keras.layers.BatchNormalization(axis=axis, epsilon=1e-5, name="bn{}{}_branch2a".format(stage_char, block_char), **batch_normalization_kwargs)(y)
         y = keras.layers.Activation("relu", name="res{}{}_branch2a_relu".format(stage_char, block_char))(y)
 
         y = keras.layers.ZeroPadding1D(padding=1, name="padding{}{}_branch2b".format(stage_char, block_char))(y)
-        y = keras.layers.Conv1D(filters, kernel_size, name="res{}{}_branch2b".format(stage_char, block_char), **convolution_kwargs)(y)
+        y = keras.layers.Conv1D(filters, kernel_size, use_bias=False, name="res{}{}_branch2b".format(stage_char, block_char), **convolution_kwargs)(y)
         y = keras.layers.BatchNormalization(axis=axis, epsilon=1e-5, name="bn{}{}_branch2b".format(stage_char, block_char), **batch_normalization_kwargs)(y)
         y = keras.layers.Activation("relu", name="res{}{}_branch2b_relu".format(stage_char, block_char))(y)
 
-        y = keras.layers.Conv1D(filters * 4, (1, 1), name="res{}{}_branch2c".format(stage_char, block_char), **convolution_kwargs)(y)
+        y = keras.layers.Conv1D(filters * 4, (1, 1), use_bias=False, name="res{}{}_branch2c".format(stage_char, block_char), **convolution_kwargs)(y)
         y = keras.layers.BatchNormalization(axis=axis, epsilon=1e-5, name="bn{}{}_branch2c".format(stage_char, block_char), **batch_normalization_kwargs)(y)
 
         if block == 0:
-            shortcut = keras.layers.Conv1D(filters * 4, (1, 1), strides=stride, name="res{}{}_branch1".format(stage_char, block_char), **convolution_kwargs)(x)
+            shortcut = keras.layers.Conv1D(filters * 4, (1, 1), strides=stride, use_bias=False, name="res{}{}_branch1".format(stage_char, block_char), **convolution_kwargs)(x)
             shortcut = keras.layers.BatchNormalization(axis=axis, epsilon=1e-5, name="bn{}{}_branch1".format(stage_char, block_char), **batch_normalization_kwargs)(shortcut)
         else:
             shortcut = x

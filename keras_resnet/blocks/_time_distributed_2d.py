@@ -62,12 +62,13 @@ def time_distributed_basic_2d(filters, stage=0, block=0, kernel_size=3, stride=N
     else:
         batch_normalization_kwargs = {}
 
+    convolution_kwargs = {
+        "kernel_initializer": "he_normal",
+        "use_bias": False
+    }
+
     if "convolution" in kwargs:
-        convolution_kwargs = kwargs["convolution"]
-    else:
-        convolution_kwargs = {
-            "kernel_initializer": "he_normal"
-        }
+        convolution_kwargs = convolution_kwargs.update(kwargs["convolution"])
 
     if stride is None:
         if block != 0 or stage == 0:
@@ -160,12 +161,13 @@ def time_distributed_bottleneck_2d(filters, stage=0, block=0, kernel_size=3, str
     else:
         batch_normalization_kwargs = {}
 
+    convolution_kwargs = {
+        "kernel_initializer": "he_normal",
+        "use_bias": False
+    }
+
     if "convolution" in kwargs:
-        convolution_kwargs = kwargs["convolution"]
-    else:
-        convolution_kwargs = {
-            "kernel_initializer": "he_normal"
-        }
+        convolution_kwargs = convolution_kwargs.update(kwargs["convolution"])
 
     if stride is None:
         if block != 0 or stage == 0:

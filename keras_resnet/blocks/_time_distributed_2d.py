@@ -13,7 +13,7 @@ import keras.layers
 import keras.regularizers
 
 
-def time_distributed_basic_2d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwargs):
+def time_distributed_basic_2d(filters, stage=0, block=0, kernel_size=3, strides=None, **kwargs):
     """
 
     A time distributed two-dimensional basic block.
@@ -26,7 +26,7 @@ def time_distributed_basic_2d(filters, stage=0, block=0, kernel_size=3, stride=N
 
     :param kernel_size: size of the kernel
 
-    :param stride: int representing the stride used in the shortcut and the first conv layer, default derives stride from block id
+    :param strides: int representing the stride used in the shortcut and the first conv layer, default derives stride from block id
 
     Usage:
 
@@ -57,6 +57,21 @@ def time_distributed_basic_2d(filters, stage=0, block=0, kernel_size=3, stride=N
 
         warnings.warn(message)
 
+    if "stride" in kwargs:
+        message = """
+
+        The `stride` argument was renamed `strides` in version 0.2.0 of 
+        Keras-ResNet. It will be removed in version 0.3.0. 
+
+        You can replace `stride=` with:
+
+                strides=
+        """
+
+        warnings.warn(message)
+
+        strides = kwargs["stride"]
+
     if "batch_normalization" in kwargs:
         batch_normalization_kwargs = kwargs["batch_normalization"]
     else:
@@ -70,11 +85,11 @@ def time_distributed_basic_2d(filters, stage=0, block=0, kernel_size=3, stride=N
     if "convolution" in kwargs:
         convolution_kwargs = convolution_kwargs.update(kwargs["convolution"])
 
-    if stride is None:
+    if strides is None:
         if block != 0 or stage == 0:
-            stride = 1
+            strides = 1
         else:
-            stride = 2
+            strides = 2
 
     if keras.backend.image_data_format() == "channels_last":
         axis = 3
@@ -90,7 +105,7 @@ def time_distributed_basic_2d(filters, stage=0, block=0, kernel_size=3, stride=N
 
     def f(x):
         y = keras.layers.TimeDistributed(keras.layers.ZeroPadding2D(padding=1), name="padding{}{}_branch2a".format(stage_char, block_char))(x)
-        y = keras.layers.TimeDistributed(keras.layers.Conv2D(filters, kernel_size, strides=stride, **convolution_kwargs), name="res{}{}_branch2a".format(stage_char, block_char))(ryx)
+        y = keras.layers.TimeDistributed(keras.layers.Conv2D(filters, kernel_size, strides=strides, **convolution_kwargs), name="res{}{}_branch2a".format(stage_char, block_char))(ryx)
         y = keras.layers.TimeDistributed(keras.layers.BatchNormalization(axis=axis, epsilon=1e-5), name="bn{}{}_branch2a".format(stage_char, block_char), **batch_normalization_kwargs)(y)
         y = keras.layers.TimeDistributed(keras.layers.Activation("relu"), name="res{}{}_branch2a_relu".format(stage_char, block_char))(y)
 
@@ -99,7 +114,7 @@ def time_distributed_basic_2d(filters, stage=0, block=0, kernel_size=3, stride=N
         y = keras.layers.TimeDistributed(keras.layers.BatchNormalization(axis=axis, epsilon=1e-5), name="bn{}{}_branch2b".format(stage_char, block_char), **batch_normalization_kwargs)(y)
 
         if block == 0:
-            shortcut = keras.layers.TimeDistributed(keras.layers.Conv2D(filters, (1, 1), strides=stride, **convolution_kwargs), name="res{}{}_branch1".format(stage_char, block_char))(x)
+            shortcut = keras.layers.TimeDistributed(keras.layers.Conv2D(filters, (1, 1), strides=strides, **convolution_kwargs), name="res{}{}_branch1".format(stage_char, block_char))(x)
             shortcut = keras.layers.TimeDistributed(keras.layers.BatchNormalization(axis=axis, epsilon=1e-5), name="bn{}{}_branch1".format(stage_char, block_char), **batch_normalization_kwargs)(shortcut)
         else:
             shortcut = x
@@ -112,7 +127,7 @@ def time_distributed_basic_2d(filters, stage=0, block=0, kernel_size=3, stride=N
     return f
 
 
-def time_distributed_bottleneck_2d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwargs):
+def time_distributed_bottleneck_2d(filters, stage=0, block=0, kernel_size=3, strides=None, **kwargs):
     """
 
     A time distributed two-dimensional bottleneck block.
@@ -125,7 +140,7 @@ def time_distributed_bottleneck_2d(filters, stage=0, block=0, kernel_size=3, str
 
     :param kernel_size: size of the kernel
 
-    :param stride: int representing the stride used in the shortcut and the first conv layer, default derives stride from block id
+    :param strides: int representing the stride used in the shortcut and the first conv layer, default derives stride from block id
 
     Usage:
 
@@ -156,6 +171,21 @@ def time_distributed_bottleneck_2d(filters, stage=0, block=0, kernel_size=3, str
 
         warnings.warn(message)
 
+    if "stride" in kwargs:
+        message = """
+
+        The `stride` argument was renamed `strides` in version 0.2.0 of 
+        Keras-ResNet. It will be removed in version 0.3.0. 
+
+        You can replace `stride=` with:
+
+                strides=
+        """
+
+        warnings.warn(message)
+
+        strides = kwargs["stride"]
+
     if "batch_normalization" in kwargs:
         batch_normalization_kwargs = kwargs["batch_normalization"]
     else:
@@ -169,11 +199,11 @@ def time_distributed_bottleneck_2d(filters, stage=0, block=0, kernel_size=3, str
     if "convolution" in kwargs:
         convolution_kwargs = convolution_kwargs.update(kwargs["convolution"])
 
-    if stride is None:
+    if strides is None:
         if block != 0 or stage == 0:
-            stride = 1
+            strides = 1
         else:
-            stride = 2
+            strides = 2
 
     if keras.backend.image_data_format() == "channels_last":
         axis = 3
@@ -188,7 +218,7 @@ def time_distributed_bottleneck_2d(filters, stage=0, block=0, kernel_size=3, str
     stage_char = str(stage + 2)
 
     def f(x):
-        y = keras.layers.TimeDistributed(keras.layers.Conv2D(filters, (1, 1), strides=stride, **convolution_kwargs), name="res{}{}_branch2a".format(stage_char, block_char))(x)
+        y = keras.layers.TimeDistributed(keras.layers.Conv2D(filters, (1, 1), strides=strides, **convolution_kwargs), name="res{}{}_branch2a".format(stage_char, block_char))(x)
         y = keras.layers.TimeDistributed(keras.layers.BatchNormalization(axis=axis, epsilon=1e-5), name="bn{}{}_branch2a".format(stage_char, block_char), **batch_normalization_kwargs)(y)
         y = keras.layers.TimeDistributed(keras.layers.Activation("relu"), name="res{}{}_branch2a_relu".format(stage_char, block_char))(y)
 
@@ -201,7 +231,7 @@ def time_distributed_bottleneck_2d(filters, stage=0, block=0, kernel_size=3, str
         y = keras.layers.TimeDistributed(keras.layers.BatchNormalization(axis=axis, epsilon=1e-5), name="bn{}{}_branch2c".format(stage_char, block_char), **batch_normalization_kwargs)(y)
 
         if block == 0:
-            shortcut = keras.layers.TimeDistributed(keras.layers.Conv2D(filters * 4, (1, 1), strides=stride, **convolution_kwargs), name="res{}{}_branch1".format(stage_char, block_char))(x)
+            shortcut = keras.layers.TimeDistributed(keras.layers.Conv2D(filters * 4, (1, 1), strides=strides, **convolution_kwargs), name="res{}{}_branch1".format(stage_char, block_char))(x)
             shortcut = keras.layers.TimeDistributed(keras.layers.BatchNormalization(axis=axis, epsilon=1e-5), name="bn{}{}_branch1".format(stage_char, block_char), **batch_normalization_kwargs)(shortcut)
         else:
             shortcut = x

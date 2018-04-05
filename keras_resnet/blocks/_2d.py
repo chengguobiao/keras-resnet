@@ -13,7 +13,7 @@ import keras.layers
 import keras.regularizers
 
 
-def basic_2d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwargs):
+def basic_2d(filters, stage=0, block=0, kernel_size=3, strides=None, **kwargs):
     """
     A two-dimensional basic block.
 
@@ -25,7 +25,7 @@ def basic_2d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwargs):
 
     :param kernel_size: size of the kernel
 
-    :param stride: int representing the stride used in the shortcut and the first conv layer, default derives stride from block id
+    :param strides: int representing the stride used in the shortcut and the first conv layer, default derives stride from block id
 
     Usage:
 
@@ -49,11 +49,26 @@ def basic_2d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwargs):
     if "numerical_namess" in kwargs:
         message = """
 
-        The `numerical_namess` argument was depreciated in version 0.2.0 of 
+        The `numerical_names` argument was depreciated in version 0.2.0 of 
         Keras-ResNet. It will be removed in version 0.3.0. 
         """
 
         warnings.warn(message)
+
+    if "stride" in kwargs:
+        message = """
+
+        The `stride` argument was renamed `strides` in version 0.2.0 of 
+        Keras-ResNet. It will be removed in version 0.3.0. 
+        
+        You can replace `stride=` with:
+
+                strides=
+        """
+
+        warnings.warn(message)
+
+        strides = kwargs["stride"]
 
     if "batch_normalization" in kwargs:
         batch_normalization_kwargs = kwargs["batch_normalization"]
@@ -68,11 +83,11 @@ def basic_2d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwargs):
     if "convolution" in kwargs:
         convolution_kwargs = convolution_kwargs.update(kwargs["convolution"])
 
-    if stride is None:
+    if strides is None:
         if block != 0 or stage == 0:
-            stride = 1
+            strides = 1
         else:
-            stride = 2
+            strides = 2
 
     if keras.backend.image_data_format() == "channels_last":
         axis = 3
@@ -88,7 +103,7 @@ def basic_2d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwargs):
 
     def f(x):
         y = keras.layers.ZeroPadding2D(padding=1, name="padding{}{}_branch2a".format(stage_char, block_char))(x)
-        y = keras.layers.Conv2D(filters, kernel_size, strides=stride, name="res{}{}_branch2a".format(stage_char, block_char), **convolution_kwargs)(y)
+        y = keras.layers.Conv2D(filters, kernel_size, strides=strides, name="res{}{}_branch2a".format(stage_char, block_char), **convolution_kwargs)(y)
         y = keras.layers.BatchNormalization(axis=axis, name="bn{}{}_branch2a".format(stage_char, block_char), **batch_normalization_kwargs)(y)
         y = keras.layers.Activation("relu", name="res{}{}_branch2a_relu".format(stage_char, block_char))(y)
 
@@ -97,7 +112,7 @@ def basic_2d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwargs):
         y = keras.layers.BatchNormalization(axis=axis, name="bn{}{}_branch2b".format(stage_char, block_char), **batch_normalization_kwargs)(y)
 
         if block == 0:
-            shortcut = keras.layers.Conv2D(filters, (1, 1), strides=stride, name="res{}{}_branch1".format(stage_char, block_char), **convolution_kwargs)(x)
+            shortcut = keras.layers.Conv2D(filters, (1, 1), strides=strides, name="res{}{}_branch1".format(stage_char, block_char), **convolution_kwargs)(x)
             shortcut = keras.layers.BatchNormalization(axis=axis, name="bn{}{}_branch1".format(stage_char, block_char), **batch_normalization_kwargs)(shortcut)
         else:
             shortcut = x
@@ -110,7 +125,7 @@ def basic_2d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwargs):
     return f
 
 
-def bottleneck_2d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwargs):
+def bottleneck_2d(filters, stage=0, block=0, kernel_size=3, strides=None, **kwargs):
     """
     A two-dimensional bottleneck block.
 
@@ -122,7 +137,7 @@ def bottleneck_2d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwarg
 
     :param kernel_size: size of the kernel
 
-    :param stride: int representing the stride used in the shortcut and the first conv layer, default derives stride from block id
+    :param strides: int representing the stride used in the shortcut and the first conv layer, default derives stride from block id
 
     Usage:
 
@@ -152,6 +167,21 @@ def bottleneck_2d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwarg
 
         warnings.warn(message)
 
+    if "stride" in kwargs:
+        message = """
+
+        The `stride` argument was renamed `strides` in version 0.2.0 of 
+        Keras-ResNet. It will be removed in version 0.3.0. 
+
+        You can replace `stride=` with:
+
+                strides=
+        """
+
+        warnings.warn(message)
+
+        strides = kwargs["stride"]
+
     if "batch_normalization" in kwargs:
         batch_normalization_kwargs = kwargs["batch_normalization"]
     else:
@@ -165,11 +195,11 @@ def bottleneck_2d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwarg
     if "convolution" in kwargs:
         convolution_kwargs = convolution_kwargs.update(kwargs["convolution"])
 
-    if stride is None:
+    if strides is None:
         if block != 0 or stage == 0:
-            stride = 1
+            strides = 1
         else:
-            stride = 2
+            strides = 2
 
     if keras.backend.image_data_format() == "channels_last":
         axis = 3
@@ -184,7 +214,7 @@ def bottleneck_2d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwarg
     stage_char = str(stage + 2)
 
     def f(x):
-        y = keras.layers.Conv2D(filters, (1, 1), strides=stride, name="res{}{}_branch2a".format(stage_char, block_char), **convolution_kwargs)(x)
+        y = keras.layers.Conv2D(filters, (1, 1), strides=strides, name="res{}{}_branch2a".format(stage_char, block_char), **convolution_kwargs)(x)
         y = keras.layers.BatchNormalization(axis=axis, name="bn{}{}_branch2a".format(stage_char, block_char), **batch_normalization_kwargs)(y)
         y = keras.layers.Activation("relu", name="res{}{}_branch2a_relu".format(stage_char, block_char))(y)
 
@@ -197,7 +227,7 @@ def bottleneck_2d(filters, stage=0, block=0, kernel_size=3, stride=None, **kwarg
         y = keras.layers.BatchNormalization(axis=axis, name="bn{}{}_branch2c".format(stage_char, block_char), **batch_normalization_kwargs)(y)
 
         if block == 0:
-            shortcut = keras.layers.Conv2D(filters * 4, (1, 1), strides=stride, name="res{}{}_branch1".format(stage_char, block_char), **convolution_kwargs)(x)
+            shortcut = keras.layers.Conv2D(filters * 4, (1, 1), strides=strides, name="res{}{}_branch1".format(stage_char, block_char), **convolution_kwargs)(x)
             shortcut = keras.layers.BatchNormalization(axis=axis, name="bn{}{}_branch1".format(stage_char, block_char), **batch_normalization_kwargs)(shortcut)
         else:
             shortcut = x

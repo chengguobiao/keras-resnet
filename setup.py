@@ -13,6 +13,7 @@ setuptools.setup(
         ]
     },
     install_requires=[
+        "deprecated",
         "keras >= 2.1.3"
     ],
     license="MIT",

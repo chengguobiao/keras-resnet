@@ -9,16 +9,51 @@ This module implements popular two-dimensional residual models.
 
 import warnings
 
+import deprecated
 import keras.backend
+import keras.layers
 import keras.layers
 import keras.models
 import keras.regularizers
 
 import keras_resnet.blocks
-import keras.layers
 
 
-def ResNet(inputs, blocks, block, include_top=True, classes=1000, preamble=None, *args, **kwargs):
+@deprecated.deprecated(
+    reason="""
+
+    The `ResNet` function was renamed in version 0.2.0 of Keras-ResNet. It 
+    will be removed in version 0.3.0.
+
+    You can replace `keras_resnet.models.ResNet` with:
+
+        keras_resnet.models.resnet
+    """,
+    version="0.2.0"
+)
+def ResNet(
+    inputs,
+    blocks,
+    block,
+    include_top=True,
+    classes=1000,
+    preamble=None,
+    *args,
+    **kwargs
+):
+    return ResNet(
+        inputs,
+        blocks,
+        block,
+        include_top=include_top,
+        classes=classes,
+        preamble=preamble,
+        *args,
+        **kwargs
+    )
+
+
+def resnet(inputs, blocks, block, include_top=True, classes=1000, preamble=None, *args, **kwargs):
     """
     Constructs a `keras.models.Model` object using the given block count.
 
@@ -132,6 +167,18 @@ def ResNet(inputs, blocks, block, include_top=True, classes=1000, preamble=None,
         return keras.models.Model(inputs=inputs, outputs=outputs, *args, **kwargs)
 
 
+@deprecated.deprecated(
+    reason="""
+
+    The `ResNet18` function was depreciated in version 0.2.0 of Keras-ResNet. It 
+    will be removed in version 0.3.0.
+
+    You can replace `keras_resnet.models.ResNet18` with:
+
+        keras_resnet.models.resnet18
+    """,
+    version="0.2.0"
+)
 def ResNet18(inputs, blocks=None, include_top=True, classes=1000, *args, **kwargs):
     """
     Constructs a `keras.models.Model` according to the ResNet18 specifications.
@@ -161,7 +208,7 @@ def ResNet18(inputs, blocks=None, include_top=True, classes=1000, *args, **kwarg
     if blocks is None:
         blocks = [2, 2, 2, 2]
 
-    return ResNet(
+    return resnet(
         inputs,
         blocks,
         block=keras_resnet.blocks.basic_2d,
@@ -172,6 +219,18 @@ def ResNet18(inputs, blocks=None, include_top=True, classes=1000, *args, **kwarg
     )
 
 
+@deprecated.deprecated(
+    reason="""
+
+    The `ResNet34` function was depreciated in version 0.2.0 of Keras-ResNet. It 
+    will be removed in version 0.3.0.
+
+    You can replace `keras_resnet.models.ResNet34` with:
+
+        keras_resnet.models.resnet34
+    """,
+    version="0.2.0"
+)
 def ResNet34(inputs, blocks=None, include_top=True, classes=1000, *args, **kwargs):
     """
     Constructs a `keras.models.Model` according to the ResNet34 specifications.
@@ -201,7 +260,7 @@ def ResNet34(inputs, blocks=None, include_top=True, classes=1000, *args, **kwarg
     if blocks is None:
         blocks = [3, 4, 6, 3]
 
-    return ResNet(
+    return resnet(
         inputs,
         blocks,
         block=keras_resnet.blocks.basic_2d,
@@ -212,6 +271,18 @@ def ResNet34(inputs, blocks=None, include_top=True, classes=1000, *args, **kwarg
     )
 
 
+@deprecated.deprecated(
+    reason="""
+
+    The `ResNet50` function was depreciated in version 0.2.0 of Keras-ResNet. It 
+    will be removed in version 0.3.0.
+
+    You can replace `keras_resnet.models.ResNet50` with:
+
+        keras_resnet.models.resnet50
+    """,
+    version="0.2.0"
+)
 def ResNet50(inputs, blocks=None, include_top=True, classes=1000, *args, **kwargs):
     """
     Constructs a `keras.models.Model` according to the ResNet50 specifications.
@@ -243,7 +314,7 @@ def ResNet50(inputs, blocks=None, include_top=True, classes=1000, *args, **kwarg
 
     numerical_names = [False, False, False, False]
 
-    return ResNet(
+    return resnet(
         inputs,
         blocks,
         numerical_names=numerical_names,
@@ -255,6 +326,18 @@ def ResNet50(inputs, blocks=None, include_top=True, classes=1000, *args, **kwarg
     )
 
 
+@deprecated.deprecated(
+    reason="""
+
+    The `ResNet101` function was depreciated in version 0.2.0 of Keras-ResNet. It 
+    will be removed in version 0.3.0.
+
+    You can replace `keras_resnet.models.ResNet101` with:
+
+        keras_resnet.models.resnet101
+    """,
+    version="0.2.0"
+)
 def ResNet101(inputs, blocks=None, include_top=True, classes=1000, *args, **kwargs):
     """
     Constructs a `keras.models.Model` according to the ResNet101 specifications.
@@ -286,7 +369,7 @@ def ResNet101(inputs, blocks=None, include_top=True, classes=1000, *args, **kwar
 
     numerical_names = [False, True, True, False]
 
-    return ResNet(
+    return resnet(
         inputs,
         blocks,
         numerical_names=numerical_names,
@@ -298,6 +381,18 @@ def ResNet101(inputs, blocks=None, include_top=True, classes=1000, *args, **kwar
     )
 
 
+@deprecated.deprecated(
+    reason="""
+
+    The `ResNet152` function was depreciated in version 0.2.0 of Keras-ResNet. It 
+    will be removed in version 0.3.0.
+
+    You can replace `keras_resnet.models.ResNet152` with:
+
+        keras_resnet.models.resnet101
+    """,
+    version="0.2.0"
+)
 def ResNet152(inputs, blocks=None, include_top=True, classes=1000, *args, **kwargs):
     """
     Constructs a `keras.models.Model` according to the ResNet152 specifications.
@@ -329,7 +424,7 @@ def ResNet152(inputs, blocks=None, include_top=True, classes=1000, *args, **kwar
 
     kwargs["numerical_names"] = [False, True, True, False]
 
-    return ResNet(
+    return resnet(
         inputs,
         blocks,
         block=keras_resnet.blocks.bottleneck_2d,
@@ -340,6 +435,18 @@ def ResNet152(inputs, blocks=None, include_top=True, classes=1000, *args, **kwar
     )
 
 
+@deprecated.deprecated(
+    reason="""
+    
+    The `ResNet200` function was depreciated in version 0.2.0 of Keras-ResNet. It 
+    will be removed in version 0.3.0.
+
+    You can replace `keras_resnet.models.ResNet200` with:
+
+        keras_resnet.models.resnet200
+    """,
+    version="0.2.0"
+)
 def ResNet200(inputs, blocks=None, include_top=True, classes=1000, *args, **kwargs):
     """
     Constructs a `keras.models.Model` according to the ResNet200 specifications.
@@ -371,7 +478,7 @@ def ResNet200(inputs, blocks=None, include_top=True, classes=1000, *args, **kwar
 
     kwargs["numerical_names"] = [False, True, True, False]
 
-    return ResNet(
+    return resnet(
         inputs,
         blocks,
         block=keras_resnet.blocks.bottleneck_2d,
